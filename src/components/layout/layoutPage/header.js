@@ -5,28 +5,23 @@ import {
     ShoppingCartOutlined,
     UserOutlined
 } from '@ant-design/icons'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './styles.css';
 import { useState } from 'react';
 import axios from 'axios';
 
 function Header(query) {
+    const navigate = useNavigate();
     const { Search } = Input;
     const [condition, setCondition] = useState('');
+    const [searchKey, setSearchKey] = useState('');
     const onSearch = (value) => {
-        const newCondition = { ...condition, productId: value };
-        setCondition(newCondition);
-        console.log(value);
+        navigate("/search/" + value);
     };
 
-    //api
-    axios.get('https://034a-118-70-132-104.ngrok-free.app/api/auth/search', {
-        params: { q: query }
-    })
-        .then(response => response.data)
-        .catch(error => {
-            console.error(error)
-        });
+    const onSearchChange = (e) => {
+        setSearchKey(e.currentTarget.value);
+    }
 
     return (
         <div className='header'>
@@ -43,7 +38,7 @@ function Header(query) {
                 </div>
                 <h2 className='header-text'>Smart</h2>
                 <h2 className='header-text-1'>phone</h2>
-                <Search className='input' placeholder="Hôm nay bạn cần gì" onSearch={onSearch} />
+                <Search className='input' placeholder="Hôm nay bạn cần gì" value={searchKey} onChange={onSearchChange} onSearch={onSearch} />
                 <Link to={'/kiem-tra-don-hang'}>
                     <putton className={'putton-one'}><CarOutlined className={'icon'} />
                         Kiểm tra đơn hàng

@@ -1,17 +1,27 @@
 import axios from './request.js';
 
-
-// import axios from "./request";
 export const login = (values) => {
-        return axios.post(`/api/auth/login`, values);
+        const res = axios.post("/api/auth/login", values);
+        return res;
+};
+
+export const register = (values) => {
+        const res = axios.post("/api/auth/register", values);
+        return res;
 };
 
 export const getAllProduct = async () => {
-        try {
-                const response = await axios.get("/prod/all/0/2", 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbjAxIiwiZXhwI…rtQykYDVFwl17G3Iwt7ALeMEc7ByOQkGn6lqSopFtxLm4o3ug',);
-                console.log(response.data);
-                return response.data;
+        const bodyParameters = {
+                pageNumber: 0,
+                pageSize: 100
+        };
 
+        try {
+                const response = await axios.post(
+                        "/prod/all",
+                        bodyParameters
+                );
+                return response.data;
         } catch (error) {
                 return error;
         }
@@ -61,16 +71,20 @@ export const updateUser = (data) => {
 export const findProduct = async (id) => {
         try {
                 const res = await axios.get(`/prod/${id}`);
-
-                // console.log(res.data);
                 return res.data;
         } catch (error) {
                 console.log(error);
         }
 };
 export const getProduct = async (condition) => {
+        if (!condition) {
+                condition = {
+                        "page": 0,
+                        "size": 20
+                };
+        }
+
         const res = axios.post("/prod/filter/", condition);
-        // console.log(res);
         return res;
 };
 

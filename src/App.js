@@ -17,6 +17,7 @@ import RealmeC55 from './components/sanpham/realmec55';
 import SamSungZ from './components/sanpham/samsungZ';
 import KiemTraDonHang from './pages/page/kiemtradonhang';
 import Trangchu from './pages/page/trangchu';
+import Search from './pages/page/search';
 
 function App() {
   return (
@@ -35,6 +36,8 @@ function App() {
         <Route path='/kiem-tra-don-hang' element={<KiemTraDonHang />} />
         <Route path='/gio-hang' element={<Giohang />} />
         <Route path='/reno8T' element={<Reno8T />} />
+        <Route path='/prod/:id' exact element={<Reno8T />} />
+        <Route path='/search/:searchKey' exact element={<Search />} />
         <Route path='/ip14-pm-128gb' element={<Iphone14Promax128GB />} />
         <Route path='/sam-sung-s23' element={<SamSungs23 />} />
         <Route path='/real-me-c55' element={<RealmeC55 />} />

@@ -2,6 +2,7 @@ import { Button, Form, Input } from 'antd';
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../../api/axios';
+import Cookies from "js-cookie";
 import './context.css';
 
 function Login() {
@@ -11,10 +12,10 @@ function Login() {
     };
     //api
     const onFinish = (values) => {
-        console.log(values);
         login(values).then((res) => {
             if (res.data?.success === true) {
-                navigate("/user/staff");
+                Cookies.set("jwt", res.data?.data?.jwt);
+                navigate("/");
             }
         });
     }
@@ -37,7 +38,7 @@ function Login() {
                             onFinishFailed={onFinishFailed}
                             autoComplete="off"
                         >
-                            <Form.Item label="Email" name="email"
+                            <Form.Item label="Email" name="userName"
                                 rules={[{ required: true, message: 'Please input your email!' }]}>
                                 <Input />
                             </Form.Item>

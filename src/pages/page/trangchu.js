@@ -6,8 +6,9 @@ import { AppleOutlined } from '@ant-design/icons'
 import Header from '../../components/layout/layoutPage/header'
 import Footer from '../../components/layout/layoutPage/footer'
 import { useState } from 'react'
-import { getProduct } from '../../api/axios'
+import { getAllProduct } from '../../api/axios'
 import { useEffect } from 'react'
+import { NumericFormat } from 'react-number-format';
 
 function Trangchu() {
   //api 
@@ -16,18 +17,40 @@ function Trangchu() {
   const [condition, setCondition] = useState('');
 
   const listProduct = () => {
-    getProduct(condition).then((res) => {
-      console.log(res.data.data.listItem);
-      setData(res.data.data.listItem);
+    getAllProduct().then((res) => {
+      setData(res.data.listItem);
     });
   };
-  //listProduct.then((res) => {
-  //console.log(res.data.data.listItem);
-  //setData(res.data.data.listItem);
-  // });
+
+  function getListProduct() {
+    const productList = data.map(item =>
+      <Col className="gutter-row-1" span={4}>
+        <div>
+          <Link to={'/prod/'+item["productId"]} >
+            <img src={item["image"]} alt='anh-1' className='anh' />
+          </Link>
+          <h4>{item["productName"]}</h4>
+          <ul className='text-1'>
+            <h3 className='text-2'>
+              <NumericFormat value={item["price"]} displayType={'text'} thousandSeparator={true} prefix={''} /> đ 
+            </h3>
+            <del><NumericFormat value={item["price"]} displayType={'text'} thousandSeparator={true} prefix={''} /> đ</del>
+          </ul>
+        </div>
+      </Col>
+    )
+
+    return (
+      <Row gutter={22}>
+        {productList}
+      </Row>
+    );
+  }
+
   useEffect(() => {
     listProduct();
-  }, [condition]);
+  }, []);
+
   return (
     <div>
       <Header />
@@ -84,70 +107,14 @@ function Trangchu() {
       </div>
 
       <div className='content-line-5'>
-        <h3 className='text-3'>CÓ THỂ BẠN SẼ THÍCH</h3>
+        <h3 className='text-3'>Sản phẩm nổi bật</h3>
       </div>
 
       <div className='content-line-4'>
-        <Row gutter={22}>
-          <Col className="gutter-row-1" span={4}>
-            <div>
-              <Link to={'/reno8T'} >
-                <img src='https://cdn.hoanghamobile.com/i/productlist/dsp/Uploads/2023/01/12/image-removebg-preview-16.png' alt='anh-1' className='anh' />
-              </Link>
-              <h4>Reno8 T 5G - Chính hãng</h4>
-              <ul className='text-1'>
-                <h3 className='text-2'>9.990.000</h3><del>9.990.000</del>
-              </ul>
-            </div>
-          </Col>
-          <Col className="gutter-row-1" span={4}>
-            <div>
-              <Link to={'/ip14-pm-128gb'}>
-                <img src='https://cdn.hoanghamobile.com/i/productlist/dsp/Uploads/2022/09/08/44444.png' alt='anh-2' className='anh' />
-              </Link>
-              <h4>IPhone 14 Pro Max (128GB)</h4>
-              <ul className='text-1'>
-                <h3 className='text-2'>26.790.000</h3>
-              </ul>
-            </div>
-          </Col>
-          <Col className="gutter-row-1" span={4}>
-            <div>
-              <Link to={'/sam-sung-s23'}>
-                <img src='https://cdn.hoanghamobile.com/i/productlist/dsp/Uploads/2023/02/02/image-removebg-preview.png' alt='anh-3' className='anh' />
-              </Link>
-              <h4>Samsung Galaxy S23 - 8GB/256GB - Chính hãng</h4>
-              <ul className='text-1'>
-                <h3 className='text-2'>19.490.000</h3><del>24.990.000</del>
-              </ul>
-            </div>
-          </Col>
-          <Col className="gutter-row-1" span={4}>
-            <div>
-              <Link to={'/real-me-c55'}>
-                <img src='https://cdn.hoanghamobile.com/i/productlist/dsp/Uploads/2023/03/13/image-removebg-preview.png' alt='anh-4' className='anh' />
-              </Link>
-              <h4>Realme C55 - 6GB/128GB</h4>
-              <ul className='text-1'>
-                <h3 className='text-2'>4.590.000</h3><del>4.990.000</del>
-              </ul>
-            </div>
-          </Col>
-          <Col className="gutter-row-1" span={4}>
-            <div>
-              <Link to={'/sam-sung-Z'}>
-                <img src='https://cdn.hoanghamobile.com/i/productlist/dsp/Uploads/2022/08/11/screenshot-2022-08-11-090237-removebg-preview.png' alt='anh-5' className='anh' />
-              </Link>
-              <h4>Samsung Galaxy Z Flip4</h4>
-              <ul className='text-1'>
-                <h3 className='text-2'>14.990.000</h3><del>23.990.000</del>
-              </ul>
-            </div>
-          </Col>
-        </Row>
+        {getListProduct()}
       </div>
 
-      <div className='content-line-6'>
+      {/* <div className='content-line-6'>
         <h3 className='text-4'>APPLE AUTHORISED RESELLER</h3>
       </div>
 
@@ -308,7 +275,7 @@ function Trangchu() {
             </div>
           </Col>
         </Row>
-      </div>
+      </div> */}
 
       <div className='content-anh'>
         <img src='https://cdn.hoanghamobile.com/i/home/Uploads/2023/04/11/tv-xiaomi.png' alt='anh' width={'1200px'} />

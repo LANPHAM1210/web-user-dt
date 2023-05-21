@@ -1,16 +1,86 @@
 import React from 'react'
-import { Row, Carousel, Col, Checkbox } from 'antd'
+import { Row, Carousel, Col, Checkbox, Radio } from 'antd'
 import './style.css'
 import Footer from '../../components/layout/layoutPage/footer'
 import Header from '../../components/layout/layoutPage/header'
+import { getProduct } from '../../api/axios'
+import { useEffect, useState } from 'react'
+import { NumericFormat } from 'react-number-format';
+import { Link } from 'react-router-dom'
 
 function DienThoai() {
+  const [data, setData] = useState([]);
+  const [condition, setCondition] = useState({
+    "page": 0,
+    "size": 20
+  });
+
+  const [manufacturer, setManufacturer] = useState("");
+  const [price, setPrice] = useState("0,100000000");
+  const [color, setColor] = useState("");
+
+  const listProduct = () => {
+    getProduct(condition).then((res) => {
+      if (res.data.success) {
+        setData(res.data.data.listItem);
+      } else { setData([]); }
+    });
+  };
+
+  function onValueChange(e) {
+    setManufacturer(e.currentTarget.value);
+    const newCondition = { ...condition, manufacturer: e.currentTarget.value };
+    setCondition(newCondition);
+  }
+
+  function onPriceChange(e) {
+    setPrice(e.currentTarget.value);
+    var priceSplit = e.currentTarget.value.split(',');
+    const newCondition = { ...condition, priceFrom: priceSplit[0], priceTo: priceSplit[1] };
+    setCondition(newCondition);
+  }
+
+  function onColorChange(e) {
+    setColor(e.currentTarget.value);
+    const newCondition = { ...condition, color: e.currentTarget.value };
+    setCondition(newCondition);
+  }
+
+  function getListProduct() {
+    const productList = data?.map(item =>
+      <Col className="gutter-dien-thoai" span={6}>
+        <div>
+          <Link to={'/prod/' + item["productId"]} >
+            <img src={item["image"]} alt='anh-1' className='anh' />
+          </Link>
+          <h4>{item["productName"]}</h4>
+          <ul className='text-1'>
+            <h3 className='text-2'>
+              <NumericFormat value={item["price"]} displayType={'text'} thousandSeparator={true} prefix={''} /> đ
+            </h3>
+            <del><NumericFormat value={item["price"]} displayType={'text'} thousandSeparator={true} prefix={''} /> đ</del>
+          </ul>
+        </div>
+      </Col>
+    )
+
+    return (
+      <Row gutter={22}>
+        {productList}
+      </Row>
+    );
+  }
+
+  useEffect(() => {
+    listProduct();
+  }, [condition]);
+
   return (
     <div>
-    <Header />
+      <Header />
       <div className='content-line-1'>
         <Carousel autoplay>
-          <img src='https://cdn.hoanghamobile.com/i/home/Uploads/2023/04/13/ip-pc.png' alt='anh-1' /> 
+          <img src='https://cdn.hoanghamobile.com/i/home/Uploads/2023/04/13/ip-pc.png' alt='anh-1' />
           <img src='https://cdn.hoanghamobile.com/i/home/Uploads/2023/04/01/showcase-redmi-buds-4-lite-web-01.jpg' alt='anh-2' />
           <img src='https://cdn.hoanghamobile.com/i/home/Uploads/2023/03/20/xiaomi-13-series-01.jpg' alt='anh-3' />
           <img src='https://cdn.hoanghamobile.com/i/home/Uploads/2023/04/14/galaxy-z-fold4-z-flip4-02.jpg' alt='anh-4' />
@@ -20,100 +90,102 @@ function DienThoai() {
           <img src='https://cdn.hoanghamobile.com/i/home/Uploads/2023/04/10/oppo-find-n2-flip-web.jpg' alt='anh-8' />
         </Carousel>
       </div>
-      
+
       <div className='content-dt-1'>
         <div className='content-dt-line'>
           <div>
-            <h3 className='dt-text-1'>Hãng sản xuất</h3>
-              <Row className='dt-line-1'>
+            <h3 className='dt-text-1'>Hãng sản xuất {manufacturer}</h3>
+            <Row className='dt-line-1'>
               <Col span={9}>
-                <Checkbox value="Tất cả">Tất cả</Checkbox>
+                <Radio name='manufacturer' checked={manufacturer === ""} onClick={onValueChange} value="">Tất cả</Radio>
               </Col>
               <Col span={9}>
-                <Checkbox value="Iphone">Iphone</Checkbox>
+                <Radio name='manufacturer' checked={manufacturer === "Apple"} onClick={onValueChange} value="Apple">Apple</Radio>
               </Col>
-              </Row>
+            </Row>
 
-              <Row className='dt-line-1'>
+            <Row className='dt-line-1'>
               <Col span={9}>
-                <Checkbox>Samsung</Checkbox>
+                <Radio name='manufacturer' checked={manufacturer === "SamSung"} onClick={onValueChange} value="SamSung">Samsung</Radio>
               </Col>
               <Col span={9}>
-                <Checkbox>Oppo</Checkbox>
+                <Radio name='manufacturer' checked={manufacturer === "Oppo"} onClick={onValueChange} value="Oppo">Oppo</Radio>
               </Col>
-              </Row>
-    
-              <Row className='dt-line-1'>
+            </Row>
+
+            <Row className='dt-line-1'>
               <Col span={9}>
-                <Checkbox className='dt-text-2' value="Realme">Realme</Checkbox>
+                <Radio name='manufacturer' checked={manufacturer === "Realme"} onClick={onValueChange} className='dt-text-2' value="Realme">Realme</Radio>
               </Col>
               <Col span={9}>
-                <Checkbox className='dt-text-2' value="Redmi">Redmi</Checkbox>
+                <Radio name='manufacturer' checked={manufacturer === "Redmi"} onClick={onValueChange} className='dt-text-2' value="Redmi">Redmi</Radio>
               </Col>
-              </Row>
+            </Row>
           </div>
 
           <div>
-            <h3 className='dt-text-1'>Mức giá</h3>
-              <Row className='dt-line-1'>
-              <Col span={9}>
-                <Checkbox value="Tất cả">Tất cả</Checkbox>
+            <h3 className='dt-text-1'>Mức giá {price}</h3>
+            <Row className='dt-line-1'>
+              <Col span={12}>
+                <Radio name='price' checked={price === "0,100000000"} onClick={onPriceChange} value="0,100000000">Tất cả</Radio>
               </Col>
-              </Row>
+            </Row>
 
-              <Row className='dt-line-1'>
-              <Col span={9}>
-                <Checkbox>Dưới 2 triệu</Checkbox>
+            <Row className='dt-line-1'>
+              <Col span={12}>
+                <Radio name='price' checked={price === "0,2000000"} onClick={onPriceChange} value="0,2000000">Dưới 2 triệu</Radio>
               </Col>
-              </Row>
-    
-              <Row className='dt-line-1'>
-              <Col span={9}>
-                <Checkbox className='dt-text-2' value="Redmi">Từ 2 - 7 triệu</Checkbox>
-              </Col>
-              </Row>
+            </Row>
 
-              <Row className='dt-line-1'>
-              <Col span={9}>
-                <Checkbox className='dt-text-2' value="Redmi">Từ 7 - 13 triệu</Checkbox>
+            <Row className='dt-line-1'>
+              <Col span={12}>
+                <Radio className='dt-text-2' checked={price === "2000000,7000000"} onClick={onPriceChange} name='price' value="2000000,7000000">Từ 2 - 7 triệu</Radio>
               </Col>
-              </Row>
+            </Row>
 
-              <Row className='dt-line-1'>
-              <Col span={9}>
-                <Checkbox className='dt-text-2' value="Redmi">Trên 13 triệu</Checkbox>
+            <Row className='dt-line-1'>
+              <Col span={12}>
+                <Radio className='dt-text-2' name='price' checked={price === "7000000,13000000"} onClick={onPriceChange} value="7000000,13000000">Từ 7 - 13 triệu</Radio>
               </Col>
-              </Row>
+            </Row>
+
+            <Row className='dt-line-1'>
+              <Col span={12}>
+                <Radio className='dt-text-2' name='price' checked={price === "13000000,100000000"} onClick={onPriceChange} value="13000000,100000000">Trên 13 triệu</Radio>
+              </Col>
+            </Row>
           </div>
 
           <div>
-            <h3 className='dt-text-1'>Trả góp ưu đãi</h3>
-              <Row className='dt-line-1'>
+            <h3 className='dt-text-1'>Màu sắc {color}</h3>
+            <Row className='dt-line-1'>
               <Col span={9}>
-                <Checkbox value="Tất cả">Tất cả</Checkbox>
+                <Radio name='color' checked={color === ""} onClick={onColorChange} value="">Tất cả</Radio>
               </Col>
-              </Row>
-
-              <Row className='dt-line-1'>
               <Col span={9}>
-                <Checkbox>Trả góp 0%</Checkbox>
+                <Radio name='color' checked={color === "Red"} onClick={onColorChange} value="Red">Đỏ</Radio>
               </Col>
-              </Row>
-    
-              <Row className='dt-line-1'>
-              <Col span={10}>
-                <Checkbox className='dt-text-2' value="Redmi">Trả góp 0đ</Checkbox>
-              </Col>
-              </Row>
 
-              <Row className='dt-line-1'>
-              <Col span={11}>
-                <Checkbox className='dt-text-2' value="Redmi">Trả góp 0đ và 0%</Checkbox>
+            </Row>
+            <Row className='dt-line-1'>
+              <Col span={9}>
+                <Radio className='dt-text-2' name='color' checked={color === "Black"} onClick={onColorChange} value="Black">Đen</Radio>
               </Col>
-              </Row>
+              <Col span={9}>
+                <Radio className='dt-text-2' name='color' checked={color === "White"} onClick={onColorChange} value="White">Trắng</Radio>
+              </Col>
+            </Row>
+            <Row className='dt-line-1'>
+              <Col span={9}>
+                <Radio className='dt-text-2' name='color' checked={color === "Gold"} onClick={onColorChange} value="Gold">Vàng</Radio>
+              </Col>
+              <Col span={9}>
+                <Radio className='dt-text-2' name='color' checked={color === "Green"} onClick={onColorChange} value="Green">Xanh lá</Radio>
+              </Col>
+            </Row>
           </div>
         </div>
-        <div className='content-dt-line-1'> 
+        <div className='content-dt-line-1'>
           <div className='content-dt-text-1'>
             <h3>Điện thoại</h3>
             <div className='content-dt-text-2'>
@@ -126,73 +198,12 @@ function DienThoai() {
           </div>
 
           <div className='content-line-dt'>
-          <Row gutter={22}>
-            <Col className="gutter-dien-thoai" span={4}>
-            <div>
-              <img src='https://cdn.hoanghamobile.com/i/productlist/dsp/Uploads/2020/10/10/S20%20FE%20-%20Mint%20%20(1).png' alt='anh-1' className='anh'/>
-              <h4>Samsung Galaxy S20 FE 256GB - Chính hãng</h4>
-              <ul className='text-1'>
-                <h3 className='text-2'>8,550,000₫</h3><del>15,490,000₫</del>
-              </ul>
-            </div>
-            </Col>
-            <Col className="gutter-dien-thoai" span={4}>
-            <div>
-              <img src='https://cdn.hoanghamobile.com/i/productlist/dsp/Uploads/2023/02/02/image-removebg-preview-2_638109032737377121.png' alt='anh-2' className='anh'/>
-              <h4>Samsung Galaxy S23 Ultra 8GB/256GB - Chính hãng</h4>
-              <ul className='text-1'>
-                <h3 className='text-2'>23,790,000₫</h3><del>31,990,000₫</del>
-              </ul>
-            </div>
-            </Col>
-            <Col className="gutter-dien-thoai" span={4}>
-            <div>
-            <h6 className='icon-ip'>Aurthorised Reseller</h6>
-            <img src='https://cdn.hoanghamobile.com/i/productlist/dsp/Uploads/2022/09/08/anh-chup-man-hinh-2022-09-08-luc-01-57-13-removebg-preview.png' alt='anh-5' className='anh' />
-            <h4>iPhone 14 (512GB) - Chính hãng VN/A</h4>
-            <ul className='text-1'>
-              <h3 className='text-2'>24,950,000₫</h3>
-            </ul>
-            </div>
-            </Col>
-          </Row>
-          
-          <div className='content-line-dt'>
-          <Row gutter={22}>
-            <Col className="gutter-dien-thoai" span={4}>
-            <div>
-              <img src='https://cdn.hoanghamobile.com/i/productlist/dsp/Uploads/2022/08/02/combo-product-reno8-z-gold.png' alt='anh-1' className='anh'/>
-              <h4>Reno8 Z 5G - Chính hãng</h4>
-              <ul className='text-1'>
-                <h3 className='text-2'>7,890,000₫</h3><del>9,790,000₫</del>
-              </ul>
-            </div>
-            </Col>
-            <Col className="gutter-dien-thoai" span={4}>
-            <div>
-              <img src='https://cdn.hoanghamobile.com/i/productlist/dsp/Uploads/2020/10/24/6%20Pro%20-%20Purple%20(2).png' alt='anh-2' className='anh'/>
-              <h4>realme 6 pro - 8GB/128GB - Snapdragon 720G</h4>
-              <ul className='text-1'>
-                <h3 className='text-2'>7,150,000₫</h3>
-              </ul>
-            </div>
-            </Col>
-            <Col className="gutter-dien-thoai" span={4}>
-            <div>
-            <img src='https://cdn.hoanghamobile.com/i/productlist/dsp/Uploads/2022/02/17/note-11-pro-5g-2.png' alt='anh-5' className='anh' />
-            <h4>Redmi Note 11 Pro 5G - Chính hãng</h4>
-            <ul className='text-1'>
-              <h3 className='text-2'>7,250,000₫</h3><del>8,990,000₫</del>
-            </ul>
-            </div>
-            </Col>
-          </Row>
-          </div>
+            {getListProduct()}
           </div>
 
         </div>
       </div>
-    <Footer />
+      <Footer />
     </div>
   )
 }
